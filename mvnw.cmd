@@ -1,6 +1,12 @@
 @echo off
 setlocal
 
+if "%JAVA_HOME%"=="" (
+  if exist "C:\Users\user\Downloads\jdk-17.0.12_windows-x64_bin\jdk-17.0.12" (
+    set "JAVA_HOME=C:\Users\user\Downloads\jdk-17.0.12_windows-x64_bin\jdk-17.0.12"
+  )
+)
+
 set "MAVEN_VERSION=3.9.11"
 set "CACHE_DIR=%USERPROFILE%\.m2\wrapper\apache-maven-%MAVEN_VERSION%"
 set "MAVEN_HOME=%CACHE_DIR%\apache-maven-%MAVEN_VERSION%"

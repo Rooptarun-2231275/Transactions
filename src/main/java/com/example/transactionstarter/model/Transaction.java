@@ -2,19 +2,19 @@ package com.example.transactionstarter.model;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Column;
-
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
 import com.example.transactionstarter.enums.Currency;
 import com.example.transactionstarter.enums.TransactionStatus;
 import com.example.transactionstarter.enums.TransactionType;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 public class Transaction {
@@ -24,6 +24,7 @@ public class Transaction {
     private String transactionId;
 
     @NotBlank(message = "Customer ID is required")
+    @Pattern(regexp = "^CUST-\\d+$", message = "Customer ID must start with 'CUST-' followed by numbers (e.g., CUST-101)")
     @Column(nullable = false)
     private String customerId;
 
@@ -47,13 +48,9 @@ public class Transaction {
     @Column(nullable = false)
     private TransactionStatus transactionStatus;
 
-
-    // No-Args Constructor
     public Transaction() {
     }
 
-
-    // All-Args Constructor
     public Transaction(
             String transactionId,
             String customerId,
@@ -69,9 +66,6 @@ public class Transaction {
         this.transactionType = transactionType;
         this.transactionStatus = transactionStatus;
     }
-
-
-    // Getters
 
     public String getTransactionId() {
         return transactionId;
@@ -96,9 +90,6 @@ public class Transaction {
     public TransactionStatus getTransactionStatus() {
         return transactionStatus;
     }
-
-
-    // Setters
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
