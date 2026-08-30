@@ -10,11 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.transactionstarter.dto.UpdateTransactionStatusRequest;
 import com.example.transactionstarter.enums.Currency;
 import com.example.transactionstarter.enums.TransactionStatus;
 import com.example.transactionstarter.enums.TransactionType;
@@ -83,13 +85,24 @@ class TransactionStarterApplicationTests {
     }
 
     @Test
+    void testGetTransactionById() throws Exception {
+        Transaction t1 = new Transaction("TXN-1", "CUST-101", new BigDecimal("100.00"), Currency.INR, TransactionType.DEPOSIT, TransactionStatus.COMPLETED);
+        transactionRepository.save(t1);
+
+        mockMvc.perform(get("/transactions/TXN-1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionId").value("TXN-1"))
+                .andExpect(jsonPath("$.customerId").value("CUST-101"));
+    }
+
+    @Test
     void testGetTransactionsByCustomerId() throws Exception {
         Transaction t1 = new Transaction("TXN-1", "CUST-101", new BigDecimal("100.00"), Currency.INR, TransactionType.DEPOSIT, TransactionStatus.COMPLETED);
         Transaction t2 = new Transaction("TXN-2", "CUST-102", new BigDecimal("200.00"), Currency.EUR, TransactionType.WITHDRAWAL, TransactionStatus.PENDING);
         transactionRepository.save(t1);
         transactionRepository.save(t2);
 
-        mockMvc.perform(get("/transactions/CUST-101"))
+        mockMvc.perform(get("/transactions/customer/CUST-101"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].transactionId").value("TXN-1"))
@@ -111,8 +124,23 @@ class TransactionStarterApplicationTests {
     }
 
     @Test
+    void testUpdateTransactionStatus_Success() throws Exception {
+        Transaction t1 = new Transaction("TXN-1", "CUST-101", new BigDecimal("100.00"), Currency.INR, TransactionType.DEPOSIT, TransactionStatus.PENDING);
+        transactionRepository.save(t1);
+
+        UpdateTransactionStatusRequest request = new UpdateTransactionStatusRequest();
+        request.setTransactionStatus(TransactionStatus.PROCESSING);
+
+        mockMvc.perform(patch("/transactions/TXN-1/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionStatus").value("PROCESSING"));
+    }
+
+    @Test
     void testGetTransactionsByCustomerId_NotFound() throws Exception {
-        mockMvc.perform(get("/transactions/NON_EXISTENT_CUST"))
+        mockMvc.perform(get("/transactions/customer/NON_EXISTENT_CUST"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Customer not found with id: NON_EXISTENT_CUST"))
                 .andExpect(jsonPath("$.status").value(404));
