@@ -107,27 +107,27 @@ public class TransactionService {
         Transaction existing = transactionRepository.findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException("Transaction not found with id: " + id));
 
-        // Validate status transition
-        TransactionStatus currentStatus
-                = existing.getTransactionStatus();
-
         TransactionStatus newStatus
                 = transaction.getTransactionStatus();
 
-        if (!isValidStatusTransition(currentStatus, newStatus)) {
-            throw new InvalidTransactionException(
-                    "Invalid status transition from "
-                    + currentStatus
-                    + " to "
-                    + newStatus
-            );
-        }
+        TransactionStatus currentStatus
+                = existing.getTransactionStatus();
 
+        if (newStatus != null && !newStatus.equals(currentStatus)) {
+            if (!isValidStatusTransition(currentStatus, newStatus)) {
+                throw new InvalidTransactionException(
+                        "Invalid status transition from "
+                        + currentStatus
+                        + " to "
+                        + newStatus
+                );
+            }
+            existing.setTransactionStatus(newStatus);
+        }
         existing.setCustomerId(transaction.getCustomerId());
         existing.setAmount(transaction.getAmount());
         existing.setCurrency(transaction.getCurrency());
         existing.setTransactionType(transaction.getTransactionType());
-        existing.setTransactionStatus(newStatus);
 
         return transactionRepository.save(existing);
     }
