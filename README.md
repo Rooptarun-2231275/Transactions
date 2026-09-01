@@ -119,6 +119,30 @@ CANCELLED --> [*] : Terminal State
   }
   ```
 
+#### 3. Update Existing Transaction (`PUT /transactions/{id}`)
+* **Request Body:**
+  ```json
+  {
+    "transactionId": "TXN-001",
+    "customerId": "CUST-101",
+    "amount": 250.00,
+    "currency": "USD",
+    "transactionType": "PAYMENT",
+    "transactionStatus": "PROCESSING"
+  }
+  ```
+* **Response Body (`200 OK`):**
+  ```json
+  {
+    "transactionId": "TXN-001",
+    "customerId": "CUST-101",
+    "amount": 250.00,
+    "currency": "USD",
+    "transactionType": "PAYMENT",
+    "transactionStatus": "PROCESSING"
+  }
+  ```
+
 ---
 
 ## 5. Error Handling Strategy
