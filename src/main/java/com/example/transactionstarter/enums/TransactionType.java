@@ -1,9 +1,9 @@
 package com.example.transactionstarter.enums;
 
+// Enum for transaction types.
 public enum TransactionType {
     PAYMENT,
-    REFUND,
     TRANSFER,
     DEPOSIT,
-    WITHDRAWAL,
+    WITHDRAWAL
 }
